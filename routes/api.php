@@ -12,3 +12,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::apiResource('productos', ProductoController::class);
 
 
+Route::post('/productos/lote', [ProductoController::class, 'registrarLote']);
