@@ -1,5 +1,5 @@
 {
     "build": {
-        "builder": "null"
+        "builder": "dockerfile"
     }
 }
