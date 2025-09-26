@@ -1,5 +1,15 @@
 FROM php:8.2-apache
 
+# Establece el directorio de trabajo
+WORKDIR /var/www/html
+
+# Copia el proyecto
+COPY . /var/www/html
+
+# Configura Apache para servir desde /public
+RUN echo "DocumentRoot /var/www/html/public" >> /etc/apache2/sites-available/000-default.conf
+
+
 # Instala extensiones necesarias
 RUN apt-get update && apt-get install -y \
     libzip-dev zip unzip git curl libpng-dev libonig-dev libxml2-dev \
@@ -17,6 +27,7 @@ WORKDIR /var/www/html
 
 # Instala dependencias
 RUN composer install --no-dev --optimize-autoloader || true
+
 
 # Genera clave si no existe
 RUN php artisan key:generate || true
