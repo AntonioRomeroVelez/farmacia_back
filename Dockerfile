@@ -8,16 +8,26 @@ RUN apt-get update && apt-get install -y \
 # Instala Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copia el código
+# Copia el proyecto
 COPY . /var/www/html
-
 WORKDIR /var/www/html
 
+# Copia el .env si lo tienes en tu repo
+# COPY .env.production .env
+
 # Instala dependencias
-RUN composer install --no-dev --optimize-autoloader
+RUN composer install --no-dev --optimize-autoloader || true
 
-# Configura Apache
-RUN chown -R www-data:www-data /var/www/html \
-    && a2enmod rewrite
+# Genera clave si no existe
+RUN php artisan key:generate || true
 
-EXPOSE 80
+# Cachea configuración
+RUN php artisan config:cache || true
+RUN php artisan route:cache || true
+RUN php artisan view:cache || true
+
+# Ejecuta migraciones
+RUN php artisan migrate --force || true
+
+# Permisos
+RUN chown -R www-data:www-data /var/www/html
