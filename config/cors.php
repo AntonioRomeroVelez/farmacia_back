@@ -16,7 +16,7 @@ return [
     */
     'paths' => ['api/*'],
     'allowed_methods' => ['*'],
-    'allowed_origins' => ['*'], // o tu dominio frontend
+    'allowed_origins' => ['https://farmacio-front.vercel.app/'], // o tu dominio frontend
     'allowed_headers' => ['*'],
     'allowed_origins_patterns' => [],
 
