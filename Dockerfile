@@ -6,10 +6,6 @@ WORKDIR /var/www/html
 # Copia el proyecto
 COPY . /var/www/html
 
-# Configura Apache para servir desde /public
-RUN echo "DocumentRoot /var/www/html/public" >> /etc/apache2/sites-available/000-default.conf
-
-
 # Instala extensiones necesarias
 RUN apt-get update && apt-get install -y \
     libzip-dev zip unzip git curl libpng-dev libonig-dev libxml2-dev \
@@ -18,16 +14,15 @@ RUN apt-get update && apt-get install -y \
 # Instala Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copia el proyecto
-COPY . /var/www/html
-WORKDIR /var/www/html
+# Configura Apache para servir desde /public y habilita mod_rewrite
+RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/public|g' /etc/apache2/sites-available/000-default.conf \
+    && a2enmod rewrite
 
-# Copia el .env si lo tienes en tu repo
-# COPY .env.production .env
+# Permisos
+RUN chown -R www-data:www-data /var/www/html
 
 # Instala dependencias
 RUN composer install --no-dev --optimize-autoloader || true
-
 
 # Genera clave si no existe
 RUN php artisan key:generate || true
@@ -40,5 +35,5 @@ RUN php artisan view:cache || true
 # Ejecuta migraciones
 RUN php artisan migrate --force || true
 
-# Permisos
-RUN chown -R www-data:www-data /var/www/html
+# Comando final para iniciar Apache
+CMD ["apache2-foreground"]
