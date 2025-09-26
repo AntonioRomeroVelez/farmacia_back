@@ -18,6 +18,7 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/public|g' /etc/apache2/sites-available/000-default.conf \
     && a2enmod rewrite
 
+
 # Permisos
 RUN chown -R www-data:www-data /var/www/html
 
@@ -37,3 +38,7 @@ RUN php artisan migrate --force || true
 
 # Comando final para iniciar Apache
 CMD ["apache2-foreground"]
+
+
+
+
